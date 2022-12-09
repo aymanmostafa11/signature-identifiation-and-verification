@@ -1,0 +1,3 @@
+
+class SignatureClassifier:
+    pass
