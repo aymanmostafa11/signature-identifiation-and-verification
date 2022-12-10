@@ -9,10 +9,43 @@ ROOT_DIR = "data/train_test_dataset"
 TRAIN_PATH = os.path.abspath(ROOT_DIR + "/train")
 TEST_PATH = os.path.abspath(ROOT_DIR + "/test")
 
+IMG_SIZE = (256, 256)
+BATCH_SIZE = 32
+COLOR_MODE = "grayscale"
+VALIDATION_SPLIT = 0.2
+SPLIT_SEED = 42
+
 
 class DataManager:
     def __init__(self):
-        self.data: tf.data.Dataset = self.__read()
+        self.data: tf.data.Dataset = None
+        self.train_data: tf.data.Dataset = None
+        self.valid_data: tf.data.Dataset = None
+        self.test_data: tf.data.Dataset = None
+
+        self.__read()
 
     def __read(self):
-        return image_dataset_from_directory(TRAIN_PATH)
+        # TODO: Fix "data" to support COLOR_MODE (doesn't now because it is used to visualize data)
+        self.data = image_dataset_from_directory(TRAIN_PATH, image_size=IMG_SIZE)
+        self.train_data = image_dataset_from_directory(TRAIN_PATH,
+                                                       subset='training',
+                                                       validation_split=VALIDATION_SPLIT,
+                                                       seed=SPLIT_SEED,
+                                                       image_size=IMG_SIZE,
+                                                       batch_size=BATCH_SIZE,
+                                                       color_mode=COLOR_MODE)
+
+        self.valid_data = image_dataset_from_directory(TRAIN_PATH,
+                                                       subset='validation',
+                                                       validation_split=VALIDATION_SPLIT,
+                                                       seed=SPLIT_SEED,
+                                                       image_size=IMG_SIZE,
+                                                       batch_size=BATCH_SIZE,
+                                                       color_mode=COLOR_MODE)
+
+        self.test_data = image_dataset_from_directory(TEST_PATH,
+                                                      seed=42,
+                                                      image_size=IMG_SIZE,
+                                                      batch_size=BATCH_SIZE,
+                                                      color_mode=COLOR_MODE)

@@ -1,3 +1,8 @@
+# ignore all weights files except best
+models/pretrained/*
+!models/pretrained/best_signature.hdf5
+!models/pretrained/best_forgery.hdf5
+
 # Ignore data files
 data/
 
