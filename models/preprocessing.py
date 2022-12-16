@@ -49,3 +49,5 @@ class DataManager:
                                                       image_size=IMG_SIZE,
                                                       batch_size=BATCH_SIZE,
                                                       color_mode=COLOR_MODE)
+    def load_data(self):
+        self.__read()

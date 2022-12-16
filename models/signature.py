@@ -1,7 +1,7 @@
 import tensorflow as tf
 import keras
 
-PRETRAINED_DIR = "./models/pretrained/"
+PRETRAINED_DIR = "pretrained/"
 
 
 class SignatureClassifier:
@@ -11,7 +11,7 @@ class SignatureClassifier:
 
     def __load_pretrained(self):
         try:
-            model = keras.models.load_model(PRETRAINED_DIR + "best_signature.hdf5")
+            model = keras.models.load_model(PRETRAINED_DIR + "good_model.hdf5")
             print("Loaded Model:")
             model.summary()
         except FileNotFoundError:
@@ -20,5 +20,13 @@ class SignatureClassifier:
 
     def __fit_new(self):
         pass
+
+    def predict(self, test_data):
+        return self.model.predict(test_data)
+    
+    def eveluate(self, test_data):
+        return self.model.evaluate(test_data)
+
+
 
 
