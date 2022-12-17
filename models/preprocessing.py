@@ -23,8 +23,6 @@ class DataManager:
         self.valid_data: tf.data.Dataset = None
         self.test_data: tf.data.Dataset = None
 
-        self.__read()
-
     def __read(self):
         # TODO: Fix "data" to support COLOR_MODE (doesn't now because it is used to visualize data)
         self.data = image_dataset_from_directory(TRAIN_PATH, image_size=IMG_SIZE)
@@ -49,5 +47,15 @@ class DataManager:
                                                       image_size=IMG_SIZE,
                                                       batch_size=BATCH_SIZE,
                                                       color_mode=COLOR_MODE)
+
     def load_data(self):
         self.__read()
+
+    def preprocess_single(self, img):
+        img = tf.image.resize(img, IMG_SIZE)
+        if COLOR_MODE == "grayscale":
+            img = tf.image.rgb_to_grayscale(img)
+
+        img = np.expand_dims(img, axis=0)  # Format as a batch
+
+        return img

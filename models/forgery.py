@@ -1,3 +1,5 @@
 
 class ForgeryDetector:
-    pass
+
+    def predict_single(self, img, label):
+        return True
