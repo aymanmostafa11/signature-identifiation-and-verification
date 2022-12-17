@@ -1,11 +1,7 @@
 import tensorflow as tf
 import keras
 
-<<<<<<< HEAD
-PRETRAINED_DIR = "models/pretrained/"
-=======
 PRETRAINED_DIR = "./models/pretrained/"
->>>>>>> f2e917874b65cc84dfd73c29bb7c3c74f0be5b19
 
 
 class SignatureClassifier:
