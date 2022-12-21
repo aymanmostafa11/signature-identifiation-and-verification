@@ -2,7 +2,7 @@ from models.preprocessing import DataManager
 from models.signature import SignatureClassifier
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from models.Pipelines import CNN_Siamese_Pipeline
+from models.Pipelines import CNN_encoder_Pipeline
 from PIL import Image
 
 if __name__ == "__main__":
@@ -16,6 +16,6 @@ if __name__ == "__main__":
     img = tf.keras.utils.load_img("data/train_test_dataset/test/personD/personD_21.png")
     img = tf.keras.utils.img_to_array(img)
 
-    pipeline = CNN_Siamese_Pipeline()
+    pipeline = CNN_encoder_Pipeline()
     pipeline.run_single(img)
 
