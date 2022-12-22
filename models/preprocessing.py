@@ -2,8 +2,6 @@ import tensorflow as tf
 from keras.utils import image_dataset_from_directory
 import numpy as np
 import os
-from warnings import filterwarnings
-
 
 ROOT_DIR = "data/train_test_dataset"
 TRAIN_PATH = os.path.abspath(ROOT_DIR + "/train")
@@ -11,7 +9,7 @@ TEST_PATH = os.path.abspath(ROOT_DIR + "/test")
 
 IMG_SIZE = (256, 256)
 BATCH_SIZE = 32
-COLOR_MODE = "grayscale"
+COLOR_MODE = "rgb"
 VALIDATION_SPLIT = 0.2
 SPLIT_SEED = 42
 
@@ -51,11 +49,27 @@ class DataManager:
     def load_data(self):
         self.__read()
 
-    def preprocess_single(self, img):
+
+class Preprocessor:
+    MODEL_CLASSIFIER = "classifier"
+    MODEL_VERIFIER = "verifier"
+    MODEL_DETECTOR = "detector"
+
+    __model_types = [MODEL_CLASSIFIER, MODEL_VERIFIER, MODEL_CLASSIFIER]
+    @staticmethod
+    def preprocess_single(img, model_type: str):
+        """
+        :param img: image as numpy array or any tensorflow compatible format
+        :param model_type: apply which model preprocessing, one of "classifier", "verifier", "detector"
+        :return:
+        """
+        assert model_type in Preprocessor.__model_types , f"Choosen model type not available, must be in " \
+                                                          f"{Preprocessor.__model_types}"
+
         img = tf.image.resize(img, IMG_SIZE)
-        if COLOR_MODE == "grayscale":
+
+        if model_type == Preprocessor.MODEL_CLASSIFIER:
             img = tf.image.rgb_to_grayscale(img)
 
-        img = np.expand_dims(img, axis=0)  # Format as a batch
-
+        img = np.expand_dims(img, axis=0)
         return img

@@ -1,32 +1,34 @@
-from preprocessing import DataManager
+from models.preprocessing import DataManager
 from tensorflow import keras
 import pickle
 import numpy as np
 import cv2
+import os
 
-IMG_SHAPE = (256,256)
-ROOT = 'D:/FCIS/4th\CV\Project\signature-identifiation-and-verification'
+IMG_SHAPE = (256, 256)
+ROOT = os.path.abspath(os.path.curdir)
+
 
 class SignatureVerifier:
-
+    threshold = 0.7
     def __init__(self):
-        self.encoder = keras.models.load_model(ROOT+'\saved models\saved-encoder.h5')
+        self.encoder = keras.models.load_model(ROOT+'\saved models\saved-encoder.h5', compile=False)
         self.database = pickle.load(open(ROOT+'\saved models\saved_embeddings.p', 'rb'))
 
     # still experimenting with the threshold value
-    def predict_single(self, img_path: str, id: str, threshold: float):
+    def predict_single(self, img: np.ndarray, id: str, threshold: float = threshold):
         """
-        :param img_path: path for image
+        :param img: image
         :param id: The ID of the signature i.e: 'PersonA'
         :param threshold: threshold to use for classification
         :return: False if signature is forged, True if genuine
         """
         anchor_embedding = self.database[id]
-        print(img_path)
-        img = self.__read_image(image_path = img_path)
+        #print(img_path)
+        #img = self.__read_image(image_path = img_path)
         img_embedding = self.encoder.predict(img)
         distance = np.linalg.norm(np.subtract(anchor_embedding, img_embedding))
-        prediction = np.where(distance<threshold, 1, 0)
+        prediction = np.where(distance < threshold, 1, 0)
 
         return prediction == 1
 

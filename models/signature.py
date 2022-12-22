@@ -3,9 +3,11 @@ import keras
 
 PRETRAINED_DIR = "./models/pretrained/"
 
+label_map = {0: "personA", 1: "personB", 2: "personC", 3: "personD", 4: "personE"}
 
 class SignatureClassifier:
-
+    IMG_SIZE = (256, 256)
+    COLOR_MODE = "grayscale"
     def __init__(self, from_pretrained=False):
         self.__model: keras.Sequential = self.__load_pretrained() if from_pretrained else self.__fit_new()
 
@@ -26,7 +28,7 @@ class SignatureClassifier:
     def __fit_new(self):
         pass
 
-    def predict(self, data, as_proba=False):
+    def predict(self, data, as_proba=False, as_class_name=False):
         """
         :param data: an image or batch of images of shape (m,IMG_SIZE[0], IMG_SIZE[1], channels)
         :param as_proba: return predicted probabilities instead of class index
@@ -37,7 +39,12 @@ class SignatureClassifier:
         if as_proba:
             return pred
 
-        return pred.argmax(axis=1).squeeze()
+        class_indx = pred.argmax(axis=1)[0]
+
+        if as_class_name:
+            return label_map[class_indx]
+
+        return class_indx
 
     
     def eveluate(self, test_data):
