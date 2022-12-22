@@ -2,6 +2,9 @@
 models/pretrained/*
 !models/pretrained/best_signature.hdf5
 !models/pretrained/best_forgery.hdf5
+!models/pretrained/classical_predictor.p
+!models/pretrained/classical_clusterer.p
+
 
 # Ignore data files
 data/

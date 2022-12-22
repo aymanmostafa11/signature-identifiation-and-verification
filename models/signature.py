@@ -1,13 +1,19 @@
+import pickle
 import tensorflow as tf
 import keras
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.cluster import KMeans
+import cv2
+import numpy as np
 
 PRETRAINED_DIR = "./models/pretrained/"
+
+IMG_SIZE = (256, 256)
+COLOR_MODE = "grayscale"
 
 label_map = {0: "personA", 1: "personB", 2: "personC", 3: "personD", 4: "personE"}
 
 class SignatureClassifier:
-    IMG_SIZE = (256, 256)
-    COLOR_MODE = "grayscale"
     def __init__(self, from_pretrained=False):
         self.__model: keras.Sequential = self.__load_pretrained() if from_pretrained else self.__fit_new()
 
@@ -46,10 +52,33 @@ class SignatureClassifier:
 
         return class_indx
 
-    
-    def eveluate(self, test_data):
+    def evaluate(self, test_data):
         return self.__model.evaluate(test_data)
 
 
+class ClassicalClassifier:
+    def __init__(self):
+        self.__predictor: RandomForestClassifier = pickle.load(open("models/pretrained/classical_predictor.p", "rb"))
+        self.__kmeans: KMeans = pickle.load(open("models/pretrained/classical_clusterer.p", "rb"))
+        self.__sift = cv2.SIFT_create()
+        self.__no_clusters = 50
 
+    def predict(self, data):
+        data = tf.image.resize(data, IMG_SIZE).numpy().astype(np.uint8)
+        bow = self.__img_to_bow(data).reshape(-1, 1)
+        pred = self.__predictor.predict(bow)
+        return pred
 
+    def __extract_sift_features(self, img):
+        try:
+            kps, desc = self.__sift.detectAndCompute(img, None)
+            return desc
+        except Exception as e:
+            print(f"img: {img.shape}, {e}")
+
+    def __img_to_bow(self, img):
+        descriptors = self.__extract_sift_features(img)
+
+        pred = self.__kmeans.predict(descriptors)
+        bow = np.histogram(pred, bins=self.__no_clusters)[0]
+        return bow

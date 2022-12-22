@@ -49,6 +49,20 @@ class DataManager:
     def load_data(self):
         self.__read()
 
+    @staticmethod
+    def read_image(path: str, as_array=True):
+        """
+        Reads an image from disk and returns is
+        :param path: absolute path to image
+        :param as_array: whether to return the image as a numpy.ndarray or a PIL image
+        :return: PIL image or numpy.ndarray
+        """
+        img = tf.keras.utils.load_img(path)
+        if not as_array:
+            return img
+
+        img = tf.keras.utils.img_to_array(img)
+        return img
 
 class Preprocessor:
     MODEL_CLASSIFIER = "classifier"
