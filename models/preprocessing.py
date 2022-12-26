@@ -28,13 +28,13 @@ class DataManager:
         """
         if subset in ["train", "all"]:
             self.data = image_dataset_from_directory(TRAIN_PATH, image_size=IMG_SIZE)
-            self.train_data = image_dataset_from_directory(TRAIN_PATH,
-                                                           subset='training',
-                                                           validation_split=VALIDATION_SPLIT,
-                                                           seed=SPLIT_SEED,
-                                                           image_size=IMG_SIZE,
-                                                           batch_size=BATCH_SIZE,
-                                                           color_mode=COLOR_MODE)
+            # self.train_data = image_dataset_from_directory(TRAIN_PATH,
+            #                                                subset='training',
+            #                                                validation_split=VALIDATION_SPLIT,
+            #                                                seed=SPLIT_SEED,
+            #                                                image_size=IMG_SIZE,
+            #                                                batch_size=BATCH_SIZE,
+            #                                                color_mode=COLOR_MODE)
         if subset in ["valid", "all"]:
             self.valid_data = image_dataset_from_directory(TRAIN_PATH,
                                                            subset='validation',
@@ -141,12 +141,12 @@ class Preprocessor:
 
     # tf.dataset specific functions
     @staticmethod
-    def __to_grayscale(img, label=None):
+    def __to_grayscale(img, label):
         img = tf.image.rgb_to_grayscale(img)
-        return img, label if label else img
+        return img, label
 
     @staticmethod
     def __resize(img, label):
         img = tf.image.resize(img, IMG_SIZE)
-        return img, label if label else img
+        return img, label
 
