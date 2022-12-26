@@ -6,5 +6,5 @@ dataManager.load_data()
 
 classifier = SignatureClassifier(from_pretrained=True)
 
-classifier.eveluate(test_data=dataManager.test_data)
+classifier.evaluate(test_data=dataManager.test_data)
 
