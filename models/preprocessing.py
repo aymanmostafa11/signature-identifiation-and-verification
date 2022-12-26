@@ -1,7 +1,8 @@
+import os
 import tensorflow as tf
 from keras.utils import image_dataset_from_directory
 import numpy as np
-import os
+
 
 ROOT_DIR = "data/train_test_dataset"
 TRAIN_PATH = os.path.abspath(ROOT_DIR + "/train")
@@ -21,33 +22,41 @@ class DataManager:
         self.valid_data: tf.data.Dataset = None
         self.test_data: tf.data.Dataset = None
 
-    def __read(self):
-        # TODO: Fix "data" to support COLOR_MODE (doesn't now because it is used to visualize data)
-        self.data = image_dataset_from_directory(TRAIN_PATH, image_size=IMG_SIZE)
-        self.train_data = image_dataset_from_directory(TRAIN_PATH,
-                                                       subset='training',
-                                                       validation_split=VALIDATION_SPLIT,
-                                                       seed=SPLIT_SEED,
-                                                       image_size=IMG_SIZE,
-                                                       batch_size=BATCH_SIZE,
-                                                       color_mode=COLOR_MODE)
+    def __read(self, subset="all"):
+        """
+        :param subset: one of ["train", "valid", "test", "all"]
+        """
+        if subset in ["train", "all"]:
+            self.data = image_dataset_from_directory(TRAIN_PATH, image_size=IMG_SIZE)
+            self.train_data = image_dataset_from_directory(TRAIN_PATH,
+                                                           subset='training',
+                                                           validation_split=VALIDATION_SPLIT,
+                                                           seed=SPLIT_SEED,
+                                                           image_size=IMG_SIZE,
+                                                           batch_size=BATCH_SIZE,
+                                                           color_mode=COLOR_MODE)
+        if subset in ["valid", "all"]:
+            self.valid_data = image_dataset_from_directory(TRAIN_PATH,
+                                                           subset='validation',
+                                                           validation_split=VALIDATION_SPLIT,
+                                                           seed=SPLIT_SEED,
+                                                           image_size=IMG_SIZE,
+                                                           batch_size=BATCH_SIZE,
+                                                           color_mode=COLOR_MODE)
 
-        self.valid_data = image_dataset_from_directory(TRAIN_PATH,
-                                                       subset='validation',
-                                                       validation_split=VALIDATION_SPLIT,
-                                                       seed=SPLIT_SEED,
-                                                       image_size=IMG_SIZE,
-                                                       batch_size=BATCH_SIZE,
-                                                       color_mode=COLOR_MODE)
+        if subset in ["test", "all"]:
+            self.test_data = image_dataset_from_directory(TEST_PATH,
+                                                          seed=42,
+                                                          image_size=IMG_SIZE,
+                                                          batch_size=BATCH_SIZE,
+                                                          color_mode=COLOR_MODE)
 
-        self.test_data = image_dataset_from_directory(TEST_PATH,
-                                                      seed=42,
-                                                      image_size=IMG_SIZE,
-                                                      batch_size=BATCH_SIZE,
-                                                      color_mode=COLOR_MODE)
-
-    def load_data(self):
-        self.__read()
+    def load_data(self, subset="all"):
+        """
+        load subsets of data or all of them
+        :param subset: one of (train, test, validation) to load specific dataset, if "all" is provided will load all data
+        """
+        self.__read(subset)
 
     @staticmethod
     def read_image(path: str, as_array=True):
@@ -75,7 +84,7 @@ class Preprocessor:
         """
         :param img: image as numpy array or any tensorflow compatible format
         :param model_type: apply which model preprocessing, one of "classifier", "verifier", "detector"
-        :return:
+        :return: preprocessed image
         """
         assert model_type in Preprocessor.__model_types , f"Choosen model type not available, must be in " \
                                                           f"{Preprocessor.__model_types}"
@@ -87,3 +96,34 @@ class Preprocessor:
 
         img = np.expand_dims(img, axis=0)
         return img
+
+    @staticmethod
+    def preprocess_bulk(data: tf.data.Dataset, model_type: str, external_data=False):
+        """
+        Preprocess a dataset for one of the available models
+        :param data: a tensorflow dataset to be process
+        :param model_type: apply which model preprocessing, one of "classifier", "verifier", "detector"
+        :param external_data : a flag whether this data is from the datasets already processed by DataManager
+        (will resize images if this flag is provided)
+        :return: preprocessed data
+        """
+        assert model_type in Preprocessor.__model_types, f"Choosen model type not available, must be in " \
+                                                         f"{Preprocessor.__model_types}"
+
+        if external_data:
+            data = data.map(Preprocessor.__resize)
+
+        if model_type == Preprocessor.MODEL_CLASSIFIER:
+            data = data.map(Preprocessor.__to_grayscale)
+
+        return data
+
+    # tf.dataset specific functions
+    @staticmethod
+    def __to_grayscale(img, label):
+        return tf.image.rgb_to_grayscale(img), label
+
+    @staticmethod
+    def __resize(img, label):
+        return tf.image.resize(img, IMG_SIZE), label
+
