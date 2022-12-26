@@ -44,3 +44,22 @@ class SignatureVerifier:
 
         return image
 
+    def predict_bulk(self, images, IDs: list, threshold: float = threshold):
+        """
+        :param images: images
+        :param IDs: The list of IDs of the signatures'
+        :param threshold: threshold to use for classification
+        :return: list of predictions, False if signature is forged, True if genuine
+        """
+        predictions = []
+
+        for img_no in len(images):
+            anchor_embedding = self.database[IDs[img_no]]
+            img_embedding = self.encoder.predict(images[img_no])
+            distance = np.linalg.norm(np.subtract(anchor_embedding, img_embedding))
+            pred = np.where(distance < threshold, 1, 0)
+            predictions.append(pred == 1)
+
+
+        return predictions    
+

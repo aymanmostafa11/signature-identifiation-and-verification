@@ -40,11 +40,10 @@ class CNN_encoder_Pipeline: # NOQA
         cnn_data = Preprocessor.preprocess_bulk(data, Preprocessor.MODEL_CLASSIFIER)
         cnn_output = self.cnn_classifier.predict(cnn_data, as_class_name=True)
 
-        # TODO: add verifier for bulk
-        #if verbose:
-        #    print("Verifying Images..")
-        #encoder_img = Preprocessor.preprocess_single(data, Preprocessor.MODEL_VERIFIER)
-        #encoder_output = self.verifier.predict_bulk(encoder_img, cnn_output)
+        if verbose:
+           print("Verifying Images..")
+        encoder_images = Preprocessor.preprocess_bulk(data, Preprocessor.MODEL_VERIFIER)
+        encoder_output = self.verifier.predict_bulk(encoder_images, cnn_output)
 
 
     def evaluate(self, subset="test"):
