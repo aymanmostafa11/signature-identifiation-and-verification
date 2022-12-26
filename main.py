@@ -15,22 +15,16 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    pipeline = CNN_encoder_Pipeline()
     if args.mode == "infer":
-        path = os.path.join(root_dir, args.path)
-        if os.path.isdir(path):  # batch mode
-            pass  # TODO: Run pipeline on batch
+        abs_path = os.path.join(root_dir, args.path)
+        if os.path.isdir(abs_path):  # batch mode
+            pipeline.run_bulk(abs_path)
         else:
-            try:
-                pipeline = CNN_encoder_Pipeline()
-                pipeline.run_single(path)
-            except FileNotFoundError as e:
-                print(f"Img not found at given path: {args['img_path']}")
-                exit()
+            pipeline.run_single(abs_path)
 
     elif args.mode == "evaluate":
-
         if args.path in ["train", "test"]:  # predefined data
-            pipeline = CNN_encoder_Pipeline()
             pipeline.evaluate(args.path)
         else:  # new data
             pass

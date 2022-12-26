@@ -38,17 +38,18 @@ class SignatureClassifier:
         """
         :param data: an image or batch of images of shape (m,IMG_SIZE[0], IMG_SIZE[1], channels)
         :param as_proba: return predicted probabilities instead of class index
-        :return: Single Class number or np.ndarray depicting the probability of each class
+        :return: Class number(s) or np.ndarray depicting the probability of each class
         """
         pred = self.__model.predict(data)
 
         if as_proba:
             return pred
 
-        class_indx = pred.argmax(axis=1)[0]
+        class_indx = pred.argmax(axis=1)
 
         if as_class_name:
-            return label_map[class_indx]
+            names = [label_map[indx] for indx in class_indx]
+            return names[0] if len(names) == 1 else names
 
         return class_indx
 

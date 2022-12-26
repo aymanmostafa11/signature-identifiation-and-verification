@@ -73,6 +73,27 @@ class DataManager:
         img = tf.keras.utils.img_to_array(img)
         return img
 
+    @staticmethod
+    def read_bulk(path: str):
+        """
+        Read bulk of images from a directory
+        :param path: absolute path to directory
+        :return: tf.data.Dataset
+        """
+        assert os.path.isdir(path), f"Please provide a path to a directory containing images, provided: {path}"
+        data = image_dataset_from_directory(path,
+                                            shuffle=False,
+                                            label_mode=None,
+                                            seed=42,
+                                            image_size=IMG_SIZE,
+                                            batch_size=BATCH_SIZE,
+                                            color_mode=COLOR_MODE)
+
+        assert data.cardinality().numpy() > 0, "No data found in the provided directory"
+
+        return data
+
+
 class Preprocessor:
     MODEL_CLASSIFIER = "classifier"
     MODEL_VERIFIER = "verifier"
@@ -120,10 +141,12 @@ class Preprocessor:
 
     # tf.dataset specific functions
     @staticmethod
-    def __to_grayscale(img, label):
-        return tf.image.rgb_to_grayscale(img), label
+    def __to_grayscale(img, label=None):
+        img = tf.image.rgb_to_grayscale(img)
+        return img, label if label else img
 
     @staticmethod
     def __resize(img, label):
-        return tf.image.resize(img, IMG_SIZE), label
+        img = tf.image.resize(img, IMG_SIZE)
+        return img, label if label else img
 

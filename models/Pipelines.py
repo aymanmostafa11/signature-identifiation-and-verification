@@ -35,12 +35,22 @@ class CNN_encoder_Pipeline: # NOQA
         :param path: abs path to a folder containing images to be classified and verified
         :param verbose: print messages
         """
-        pass
+        data = DataManager.read_bulk(path)
+
+        cnn_data = Preprocessor.preprocess_bulk(data, Preprocessor.MODEL_CLASSIFIER)
+        cnn_output = self.cnn_classifier.predict(cnn_data, as_class_name=True)
+
+        # TODO: add verifier for bulk
+        #if verbose:
+        #    print("Verifying Images..")
+        #encoder_img = Preprocessor.preprocess_single(data, Preprocessor.MODEL_VERIFIER)
+        #encoder_output = self.verifier.predict_bulk(encoder_img, cnn_output)
+
 
     def evaluate(self, subset="test"):
         """
         Evaluate the pipeline on predefined data (train or test set)
-        :param subset: one of ["train", "test", "other"]
+        :param subset: one of ["train", "test"]
         """
         assert subset in ["train", "test"], "Please provide a valid subset to evaluate the data on ('train' or 'test')"
 
