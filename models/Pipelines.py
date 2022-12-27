@@ -1,7 +1,12 @@
+import os
+import pandas as pd
+from glob import glob
+
 from models.signature import SignatureClassifier
 from models.verification import SignatureVerifier
 from models.preprocessing import DataManager
 from models.preprocessing import Preprocessor
+
 
 import warnings
 
@@ -37,6 +42,9 @@ class CNN_encoder_Pipeline: # NOQA
         """
         data = DataManager.read_bulk(path)
 
+
+        if verbose:
+           print("Classifying Images..")
         cnn_data = Preprocessor.preprocess_bulk(data, Preprocessor.MODEL_CLASSIFIER)
         cnn_output = self.cnn_classifier.predict(cnn_data, as_class_name=True)
 
@@ -45,6 +53,14 @@ class CNN_encoder_Pipeline: # NOQA
         encoder_images = Preprocessor.preprocess_bulk(data, Preprocessor.MODEL_VERIFIER)
         encoder_output = self.verifier.predict_bulk(encoder_images, cnn_output)
 
+        if verbose:
+            print("Saving to file..")
+        filenames = [os.path.basename(x) for x in glob(path + "\\*[.png,.jpg]")]
+        output = pd.DataFrame({'Img': filenames,
+                               'Class': cnn_output,
+                               'Verified': encoder_output})
+
+        output.to_csv(f"output/predictions_{len(os.listdir('output/')) + 1}.csv", index=False, encoding='utf-8')
 
     def evaluate(self, subset="test"):
         """

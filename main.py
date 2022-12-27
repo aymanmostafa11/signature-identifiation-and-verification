@@ -9,8 +9,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=["infer", "evaluate"], help="Choose the mode to run the"
                                                                                    "pipeline on")
-    parser.add_argument("-p", "--path", help="the path to infer/evaluate"
-                                             "if 'train' or 'test' is provided "
+    parser.add_argument("-p", "--path", help="the path to infer/evaluate\n"
+                                             "if 'train' or 'test' is provided"
                                              "the process is done on the existing data", required=True)
 
     args = parser.parse_args()

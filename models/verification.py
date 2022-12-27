@@ -12,7 +12,7 @@ ROOT = os.path.abspath(os.path.curdir)
 class SignatureVerifier:
     threshold = 0.7
     def __init__(self):
-        self.encoder = keras.models.load_model(ROOT+'\saved models\saved-encoder.h5', compile=False)
+        self.encoder: keras.models.Model = keras.models.load_model(ROOT+'\saved models\saved-encoder.h5', compile=False)
         self.database = pickle.load(open(ROOT+'\saved models\saved_embeddings.p', 'rb'))
 
     # still experimenting with the threshold value
@@ -53,13 +53,12 @@ class SignatureVerifier:
         """
         predictions = []
 
-        for img_no in len(images):
+        for img_no, img in enumerate(images.unbatch()):
             anchor_embedding = self.database[IDs[img_no]]
-            img_embedding = self.encoder.predict(images[img_no])
+            img_embedding = self.encoder.predict(np.expand_dims(img, axis=0), verbose=0)  # TODO: implement a cleaner sol
             distance = np.linalg.norm(np.subtract(anchor_embedding, img_embedding))
             pred = np.where(distance < threshold, 1, 0)
             predictions.append(pred == 1)
-
 
         return predictions    
 

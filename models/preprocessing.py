@@ -141,12 +141,12 @@ class Preprocessor:
 
     # tf.dataset specific functions
     @staticmethod
-    def __to_grayscale(img, label):
+    def __to_grayscale(img, label=None):
         img = tf.image.rgb_to_grayscale(img)
         return img, label
 
     @staticmethod
-    def __resize(img, label):
+    def __resize(img, label=None):
         img = tf.image.resize(img, IMG_SIZE)
         return img, label
 
