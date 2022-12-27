@@ -6,8 +6,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import KMeans
 import cv2
 import numpy as np
-ROOT = os.path.dirname(os.getcwd())
-PRETRAINED_DIR = ROOT+"/models/pretrained/"
+
+PRETRAINED_DIR = os.path.abspath("./models/pretrained/")
 
 IMG_SIZE = (256, 256)
 COLOR_MODE = "grayscale"
@@ -20,16 +20,16 @@ class SignatureClassifier:
 
     def __load_pretrained(self):
         try:
-            model = keras.models.load_model(PRETRAINED_DIR + "best_signature.hdf5")
-            print("Loaded Model:")
-            model.summary()
+            model = keras.models.load_model(PRETRAINED_DIR + "\\best_signature.hdf5")
+            print("Model Loaded")
+            #model.summary()
 
             if model.layers[-1].get_config()["activation"] != "softmax":
                 model.add(tf.keras.layers.Softmax())
             return model
-        except OSError:
+        except OSError as e:
             print("Please add the corresponding hdf5 file to 'models/pretrained/'")
-            exit()
+            raise e
 
 
     def __fit_new(self):

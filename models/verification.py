@@ -50,7 +50,15 @@ class SignatureVerifier:
         :param threshold: threshold to use for classification
         :return: list of predictions, False if signature is forged, True if genuine
         """
-        predictions = [self.predict_single(np.expand_dims(img, axis=0), self.database[IDs[id]]) for img, id in zip(images, IDs)]
+        predictions = []
+
+        for img_no, img in enumerate(images.unbatch()):
+            anchor_embedding = self.database[IDs[img_no]]
+            img_embedding = self.encoder.predict(np.expand_dims(img, axis=0),  # TODO: implement a cleaner sol
+                                                 verbose=0)
+            distance = np.linalg.norm(np.subtract(anchor_embedding, img_embedding))
+            pred = np.where(distance < threshold, 1, 0)
+            predictions.append(pred == 1)
         
         return predictions    
 
