@@ -1,3 +1,4 @@
+import os
 import pickle
 import tensorflow as tf
 import keras
@@ -5,8 +6,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import KMeans
 import cv2
 import numpy as np
-
-PRETRAINED_DIR = "./models/pretrained/"
+ROOT = os.path.dirname(os.getcwd())
+PRETRAINED_DIR = ROOT+"/models/pretrained/"
 
 IMG_SIZE = (256, 256)
 COLOR_MODE = "grayscale"
